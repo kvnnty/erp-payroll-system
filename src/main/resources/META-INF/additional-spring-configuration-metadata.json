@@ -1,0 +1,44 @@
+{
+  "properties": [
+    {
+      "name": "application.security.jwt.secret-key",
+      "type": "java.lang.String",
+      "description": "A description for 'application.security.jwt.secret-key'"
+    },
+    {
+      "name": "application.security.jwt.expiration",
+      "type": "java.lang.String",
+      "description": "A description for 'application.security.jwt.expiration'"
+    },
+    {
+      "name": "application.admin.email",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.email'"
+    },
+    {
+      "name": "application.admin.first-name",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.first-name'"
+    },
+    {
+      "name": "application.admin.last-name",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.last-name'"
+    },
+    {
+      "name": "application.admin.password",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.password'"
+    },
+    {
+      "name": "application.admin.phoneNumber",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.phoneNumber'"
+    },
+    {
+      "name": "application.admin.dob",
+      "type": "java.lang.String",
+      "description": "A description for 'application.admin.dob'"
+    }
+  ]
+}
