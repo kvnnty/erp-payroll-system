@@ -11,12 +11,12 @@ import rw.gov.erp.v1.entities.payroll.Payslip;
 
 public interface PayrollService {
 
-        public List<Payslip> generatePayroll(PayrollRequestDto request);
+        public void generatePayroll(PayrollRequestDto request);
+
+        public void approvePayroll(PayrollRequestDto request);
 
         public Payslip generatePayslipForEmployee(Employee employee, Integer month, Integer year,
                         Map<String, BigDecimal> deductionRates);
-
-        public Map<String, BigDecimal> getDeductionRates();
 
         public List<Payslip> getPayslipsByMonthAndYear(Integer month, Integer year);
 
@@ -24,5 +24,4 @@ public interface PayrollService {
 
         public List<Payslip> getEmployeePayslips(UUID employeeId);
 
-        public List<Payslip> approvePayroll(Integer month, Integer year);
 }

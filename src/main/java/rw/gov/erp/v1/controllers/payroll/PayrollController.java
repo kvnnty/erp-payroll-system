@@ -39,18 +39,19 @@ public class PayrollController {
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(summary = "Generate payroll", description = "Generate payroll for all active employees (Manager only)")
     public ResponseEntity<ApiResponse<List<Payslip>>> generatePayroll(@Valid @RequestBody PayrollRequestDto request) {
-        List<Payslip> payslips = payrollService.generatePayroll(request);
-        return ApiResponse.success("Payroll generated successfully, sent to admin for approval", HttpStatus.CREATED,
-                payslips);
+        payrollService.generatePayroll(request);
+        return ApiResponse.success(
+                "Monthly Payroll for all employees generated successfully, sent to admin for approval",
+                HttpStatus.CREATED,
+                null);
     }
 
     @PostMapping("/approve")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Approve payroll", description = "Approve payroll for a specific month/year (Admin only)")
-    public ResponseEntity<ApiResponse<List<Payslip>>> approvePayroll(@RequestParam Integer month,
-            @RequestParam Integer year) {
-        List<Payslip> payslips = payrollService.approvePayroll(month, year);
-        return ApiResponse.success("Payroll approved successfully", payslips);
+    public ResponseEntity<ApiResponse<List<Payslip>>> approvePayroll(@Valid @RequestBody PayrollRequestDto request) {
+        payrollService.approvePayroll(request);
+        return ApiResponse.success("Payroll approved successfully", null);
     }
 
     @GetMapping("/payslips")

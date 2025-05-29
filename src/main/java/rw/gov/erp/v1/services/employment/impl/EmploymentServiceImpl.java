@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 import rw.gov.erp.v1.dtos.requests.employment.EmploymentRequestDto;
 import rw.gov.erp.v1.dtos.responses.employment.EmploymentResponseDto;
 import rw.gov.erp.v1.entities.employee.Employee;
-import rw.gov.erp.v1.entities.employee.Employment;
+import rw.gov.erp.v1.entities.employment.Employment;
 import rw.gov.erp.v1.exceptions.DuplicateResourceException;
 import rw.gov.erp.v1.exceptions.ResourceNotFoundException;
 import rw.gov.erp.v1.repositories.user.EmploymentRepository;

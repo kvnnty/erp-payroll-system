@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import rw.gov.erp.v1.audits.Auditable;
+import rw.gov.erp.v1.entities.employment.Employment;
 import rw.gov.erp.v1.enums.employee.EmployeeStatus;
 
 @Entity

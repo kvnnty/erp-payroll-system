@@ -1,7 +1,7 @@
 package rw.gov.erp.v1.utils.mappers;
 
 import rw.gov.erp.v1.dtos.responses.employment.EmploymentResponseDto;
-import rw.gov.erp.v1.entities.employee.Employment;
+import rw.gov.erp.v1.entities.employment.Employment;
 
 public class EmploymentMapper {
   public static EmploymentResponseDto toDto(Employment employment) {

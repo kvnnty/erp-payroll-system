@@ -18,6 +18,7 @@ import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.entities.message.Message;
 import rw.gov.erp.v1.entities.payroll.Payslip;
 import rw.gov.erp.v1.enums.payslip.PayslipStatus;
+import rw.gov.erp.v1.exceptions.BadRequestException;
 import rw.gov.erp.v1.exceptions.DuplicateResourceException;
 import rw.gov.erp.v1.exceptions.ResourceNotFoundException;
 import rw.gov.erp.v1.repositories.message.MessageRepository;
@@ -38,10 +39,10 @@ public class PayrollServiceImpl implements PayrollService {
   private final MailService emailService;
   private final MessageRepository messageRepository;
 
-  public List<Payslip> generatePayroll(PayrollRequestDto request) {
+  public void generatePayroll(PayrollRequestDto request) {
     List<Employee> activeEmployees = employeeRepository.findAllActiveEmployees();
 
-    // Check for existing payroll for the month/year
+    // Check for existing payroll
     for (Employee employee : activeEmployees) {
       if (payslipRepository.existsByEmployeeIdAndMonthAndYear(
           employee.getId(), request.getMonth(), request.getYear())) {
@@ -54,41 +55,44 @@ public class PayrollServiceImpl implements PayrollService {
 
     Map<String, BigDecimal> deductionRates = getDeductionRates();
 
-    return activeEmployees.stream()
-        .map(employee -> generatePayslipForEmployee(employee, request.getMonth(),
-            request.getYear(),
-            deductionRates))
+    activeEmployees.stream()
+        .map(employee -> generatePayslipForEmployee(employee, request.getMonth(), request.getYear(), deductionRates))
         .collect(Collectors.toList());
   }
 
   public Payslip generatePayslipForEmployee(Employee employee, Integer month, Integer year,
       Map<String, BigDecimal> deductionRates) {
+
     BigDecimal baseSalary = employee.getEmployment().getBaseSalary();
+    double base = baseSalary.doubleValue();
 
-    // Calculate allowances (added to gross salary)
-    BigDecimal housingAmount = baseSalary.multiply(deductionRates.get("Housing")).divide(
-        BigDecimal.valueOf(100), 2,
-        RoundingMode.HALF_UP);
-    BigDecimal transportAmount = baseSalary.multiply(deductionRates.get("Transport"))
-        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    double housingRate = getRate(deductionRates, "Housing");
+    double transportRate = getRate(deductionRates, "Transport");
+    double taxRate = getRate(deductionRates, "Employee Tax");
+    double pensionRate = getRate(deductionRates, "Pension");
+    double insuranceRate = getRate(deductionRates, "Medical Insurance");
+    double otherRate = getRate(deductionRates, "Others");
 
-    // Calculate gross salary
+    // Allowances
+    BigDecimal housingAmount = toBigDecimal(housingRate * base / 100);
+    BigDecimal transportAmount = toBigDecimal(transportRate * base / 100);
+
+    // Gross
     BigDecimal grossSalary = baseSalary.add(housingAmount).add(transportAmount);
 
-    // Calculate deductions (subtracted from gross salary)
-    BigDecimal employeeTax = baseSalary.multiply(deductionRates.get("Employee Tax")).divide(
-        BigDecimal.valueOf(100),
-        2, RoundingMode.HALF_UP);
-    BigDecimal pension = baseSalary.multiply(deductionRates.get("Pension")).divide(BigDecimal.valueOf(100),
-        2,
-        RoundingMode.HALF_UP);
-    BigDecimal medicalInsurance = baseSalary.multiply(deductionRates.get("Medical Insurance"))
-        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-    BigDecimal others = baseSalary.multiply(deductionRates.get("Others")).divide(BigDecimal.valueOf(100), 2,
-        RoundingMode.HALF_UP);
+    // Deductions
+    BigDecimal employeeTax = toBigDecimal(taxRate * base / 100);
+    BigDecimal pension = toBigDecimal(pensionRate * base / 100);
+    BigDecimal medicalInsurance = toBigDecimal(insuranceRate * base / 100);
+    BigDecimal others = toBigDecimal(otherRate * base / 100);
 
-    // Calculate net salary
     BigDecimal totalDeductions = employeeTax.add(pension).add(medicalInsurance).add(others);
+
+    // Safety check
+    if (totalDeductions.compareTo(grossSalary) > 0) {
+      throw new IllegalStateException("Deductions exceed gross salary for employee " + employee.getCode());
+    }
+
     BigDecimal netSalary = grossSalary.subtract(totalDeductions);
 
     Payslip payslip = new Payslip();
@@ -109,7 +113,19 @@ public class PayrollServiceImpl implements PayrollService {
     return payslipRepository.save(payslip);
   }
 
-  public Map<String, BigDecimal> getDeductionRates() {
+  private double getRate(Map<String, BigDecimal> map, String key) {
+    BigDecimal value = map.get(key);
+    if (value == null) {
+      throw new IllegalStateException("Missing deduction rate for key: " + key);
+    }
+    return value.doubleValue();
+  }
+
+  private BigDecimal toBigDecimal(double value) {
+    return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
+  }
+
+  private Map<String, BigDecimal> getDeductionRates() {
     List<Deduction> deductions = deductionRepository.findAll();
     return deductions.stream()
         .collect(Collectors.toMap(Deduction::getDeductionName, Deduction::getPercentage));
@@ -122,28 +138,38 @@ public class PayrollServiceImpl implements PayrollService {
   public Payslip getEmployeePayslip(UUID employeeId, Integer month, Integer year) {
     return payslipRepository.findByEmployeeIdAndMonthAndYear(employeeId, month, year)
         .orElseThrow(() -> new ResourceNotFoundException(
-            "Payslip not found for employee " + employeeId + " for " + month + "/"
-                + year));
+            "Payslip not found for employee " + employeeId + " for " + month + "/" + year));
   }
 
   public List<Payslip> getEmployeePayslips(UUID employeeId) {
     return payslipRepository.findByEmployeeIdOrderByYearDescMonthDesc(employeeId);
   }
 
-  public List<Payslip> approvePayroll(Integer month, Integer year) {
+  public void approvePayroll(PayrollRequestDto request) {
+    final Integer month = request.getMonth();
+    final Integer year = request.getYear();
+
     List<Payslip> payslips = payslipRepository.findByMonthAndYear(month, year);
 
     if (payslips.isEmpty()) {
       throw new ResourceNotFoundException("No payslips found for " + month + "/" + year);
     }
 
-    payslips.forEach(payslip -> {
+    List<Payslip> unpaidPayslips = payslips.stream()
+        .filter(p -> p.getStatus() != PayslipStatus.PAID)
+        .collect(Collectors.toList());
+
+    if (unpaidPayslips.isEmpty()) {
+      throw new BadRequestException("All payslips for " + month + "/" + year + " are already paid.");
+    }
+
+    unpaidPayslips.forEach(payslip -> {
       payslip.setStatus(PayslipStatus.PAID);
       payslipRepository.save(payslip);
 
       String monthName = Month.of(payslip.getMonth()).name();
       String messageText = String.format(
-          "Dear %s, your salary for %s/%d from RCA amounting to %s RWF has been credited to your account %s successfully.",
+          "Dear %s, your salary for %s/%d amounting to %s RWF has been credited to your account %s successfully.",
           payslip.getEmployee().getFirstName(),
           monthName,
           payslip.getYear(),
@@ -156,11 +182,8 @@ public class PayrollServiceImpl implements PayrollService {
       message.setMonthYear(payslip.getMonth() + "/" + payslip.getYear());
 
       messageRepository.save(message);
-
-      // Send email notification
-      emailService.sendMail(message.getEmployee().getEmail(), "Monthly Paycheck deposited", messageText);
+      emailService.sendMail(message.getEmployee().getEmail(), "Monthly Paycheck Notification", messageText);
     });
-
-    return payslips;
   }
+
 }

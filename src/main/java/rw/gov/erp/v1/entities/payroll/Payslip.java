@@ -40,22 +40,22 @@ public class Payslip extends Auditable {
   @JoinColumn(name = "employee_id", nullable = false)
   private Employee employee;
 
-  @Column(name = "house_amount", precision = 15, scale = 2)
+  @Column(name = "housing", precision = 15, scale = 2)
   private BigDecimal houseAmount;
 
-  @Column(name = "transport_amount", precision = 15, scale = 2)
+  @Column(name = "transport", precision = 15, scale = 2)
   private BigDecimal transportAmount;
 
-  @Column(name = "employee_taxed_amount", precision = 15, scale = 2)
+  @Column(name = "tax", precision = 15, scale = 2)
   private BigDecimal employeeTaxedAmount;
 
-  @Column(name = "pension_amount", precision = 15, scale = 2)
+  @Column(name = "pension", precision = 15, scale = 2)
   private BigDecimal pensionAmount;
 
-  @Column(name = "medical_insurance_amount", precision = 15, scale = 2)
+  @Column(name = "medical", precision = 15, scale = 2)
   private BigDecimal medicalInsuranceAmount;
 
-  @Column(name = "other_taxed_amount", precision = 15, scale = 2)
+  @Column(name = "others", precision = 15, scale = 2)
   private BigDecimal otherTaxedAmount;
 
   @Column(name = "gross_salary", precision = 15, scale = 2)

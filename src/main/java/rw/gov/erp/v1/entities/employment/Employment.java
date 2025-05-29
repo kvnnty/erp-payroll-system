@@ -1,4 +1,4 @@
-package rw.gov.erp.v1.entities.employee;
+package rw.gov.erp.v1.entities.employment;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,6 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import rw.gov.erp.v1.audits.Auditable;
+import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.enums.employment.EmploymentStatus;
 
 @Entity
