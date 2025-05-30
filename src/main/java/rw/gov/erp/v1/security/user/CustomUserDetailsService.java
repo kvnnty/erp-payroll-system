@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import rw.gov.erp.v1.entities.employee.Employee;
-import rw.gov.erp.v1.repositories.user.EmployeeRepository;
+import rw.gov.erp.v1.repositories.employee.EmployeeRepository;
 
 @Service
 @RequiredArgsConstructor

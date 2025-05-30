@@ -16,8 +16,8 @@ import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.entities.employee.Role;
 import rw.gov.erp.v1.enums.employee.ERole;
 import rw.gov.erp.v1.enums.employee.EmployeeStatus;
+import rw.gov.erp.v1.repositories.employee.EmployeeRepository;
 import rw.gov.erp.v1.repositories.roles.RoleRepository;
-import rw.gov.erp.v1.repositories.user.EmployeeRepository;
 
 @Slf4j
 @Component

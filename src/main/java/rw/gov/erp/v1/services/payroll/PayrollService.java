@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import rw.gov.erp.v1.dtos.requests.payroll.PayrollRequestDto;
+import rw.gov.erp.v1.dtos.responses.payslip.PayslipResponseDto;
 import rw.gov.erp.v1.entities.employee.Employee;
-import rw.gov.erp.v1.entities.payroll.Payslip;
 
 public interface PayrollService {
 
@@ -15,13 +15,13 @@ public interface PayrollService {
 
         public void approvePayroll(PayrollRequestDto request);
 
-        public Payslip generatePayslipForEmployee(Employee employee, Integer month, Integer year,
+        public PayslipResponseDto generatePayslipForEmployee(Employee employee, Integer month, Integer year,
                         Map<String, BigDecimal> deductionRates);
 
-        public List<Payslip> getPayslipsByMonthAndYear(Integer month, Integer year);
+        public List<PayslipResponseDto> getPayslipsByMonthAndYear(Integer month, Integer year);
 
-        public Payslip getEmployeePayslip(UUID employeeId, Integer month, Integer year);
+        public PayslipResponseDto getEmployeePayslip(UUID employeeId, Integer month, Integer year);
 
-        public List<Payslip> getEmployeePayslips(UUID employeeId);
+        public List<PayslipResponseDto> getEmployeePayslips(UUID employeeId);
 
 }

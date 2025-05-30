@@ -1,4 +1,4 @@
-package rw.gov.erp.v1.repositories.user;
+package rw.gov.erp.v1.repositories.employee;
 
 import java.util.List;
 import java.util.Optional;

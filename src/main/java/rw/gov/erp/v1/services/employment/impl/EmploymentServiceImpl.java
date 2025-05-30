@@ -11,9 +11,11 @@ import rw.gov.erp.v1.dtos.requests.employment.EmploymentRequestDto;
 import rw.gov.erp.v1.dtos.responses.employment.EmploymentResponseDto;
 import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.entities.employment.Employment;
+import rw.gov.erp.v1.enums.employee.EmployeeStatus;
 import rw.gov.erp.v1.exceptions.DuplicateResourceException;
 import rw.gov.erp.v1.exceptions.ResourceNotFoundException;
-import rw.gov.erp.v1.repositories.user.EmploymentRepository;
+import rw.gov.erp.v1.repositories.employee.EmployeeRepository;
+import rw.gov.erp.v1.repositories.employment.EmploymentRepository;
 import rw.gov.erp.v1.services.employee.EmployeeService;
 import rw.gov.erp.v1.services.employment.EmploymentService;
 import rw.gov.erp.v1.utils.mappers.EmploymentMapper;
@@ -22,6 +24,8 @@ import rw.gov.erp.v1.utils.mappers.EmploymentMapper;
 @RequiredArgsConstructor
 @Transactional
 public class EmploymentServiceImpl implements EmploymentService {
+
+    private final EmployeeRepository employeeRepository;
 
     private final EmploymentRepository employmentRepository;
     private final EmployeeService employeeService;
@@ -57,6 +61,10 @@ public class EmploymentServiceImpl implements EmploymentService {
         employment.setBaseSalary(request.getBaseSalary());
         employment.setStatus(request.getStatus());
         employment.setJoiningDate(request.getJoiningDate());
+
+        // update employees status to active because he/she has been assigned a job
+        employee.setStatus(EmployeeStatus.ACTIVE);
+        employeeRepository.save(employee);
 
         return EmploymentMapper.toDto(employmentRepository.save(employment));
     }

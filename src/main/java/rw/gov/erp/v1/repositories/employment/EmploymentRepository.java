@@ -1,4 +1,4 @@
-package rw.gov.erp.v1.repositories.user;
+package rw.gov.erp.v1.repositories.employment;
 
 import java.util.Optional;
 import java.util.UUID;

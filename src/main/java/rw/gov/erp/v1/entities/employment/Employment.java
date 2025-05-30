@@ -20,7 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.gov.erp.v1.audits.Auditable;
 import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.enums.employment.EmploymentStatus;
 
@@ -30,7 +29,7 @@ import rw.gov.erp.v1.enums.employment.EmploymentStatus;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Employment extends Auditable {
+public class Employment {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

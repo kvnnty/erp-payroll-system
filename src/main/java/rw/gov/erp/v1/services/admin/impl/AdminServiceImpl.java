@@ -16,8 +16,8 @@ import rw.gov.erp.v1.enums.employee.ERole;
 import rw.gov.erp.v1.enums.employee.EmployeeStatus;
 import rw.gov.erp.v1.exceptions.DuplicateResourceException;
 import rw.gov.erp.v1.exceptions.ResourceNotFoundException;
+import rw.gov.erp.v1.repositories.employee.EmployeeRepository;
 import rw.gov.erp.v1.repositories.roles.RoleRepository;
-import rw.gov.erp.v1.repositories.user.EmployeeRepository;
 import rw.gov.erp.v1.services.admin.AdminService;
 import rw.gov.erp.v1.utils.mappers.UserMapper;
 

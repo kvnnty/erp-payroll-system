@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.gov.erp.v1.audits.Auditable;
 import rw.gov.erp.v1.entities.employee.Employee;
 
 @Entity
@@ -26,7 +25,7 @@ import rw.gov.erp.v1.entities.employee.Employee;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Message extends Auditable {
+public class Message {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

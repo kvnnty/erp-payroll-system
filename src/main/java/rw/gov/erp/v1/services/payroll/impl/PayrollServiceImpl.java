@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import rw.gov.erp.v1.dtos.requests.payroll.PayrollRequestDto;
+import rw.gov.erp.v1.dtos.responses.payslip.PayslipResponseDto;
 import rw.gov.erp.v1.entities.deduction.Deduction;
 import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.entities.message.Message;
@@ -21,12 +22,13 @@ import rw.gov.erp.v1.enums.payslip.PayslipStatus;
 import rw.gov.erp.v1.exceptions.BadRequestException;
 import rw.gov.erp.v1.exceptions.DuplicateResourceException;
 import rw.gov.erp.v1.exceptions.ResourceNotFoundException;
+import rw.gov.erp.v1.repositories.employee.EmployeeRepository;
 import rw.gov.erp.v1.repositories.message.MessageRepository;
 import rw.gov.erp.v1.repositories.payroll.DeductionRepository;
 import rw.gov.erp.v1.repositories.payroll.PayslipRepository;
-import rw.gov.erp.v1.repositories.user.EmployeeRepository;
 import rw.gov.erp.v1.services.mail.MailService;
 import rw.gov.erp.v1.services.payroll.PayrollService;
+import rw.gov.erp.v1.utils.mappers.PayslipMapper;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +62,7 @@ public class PayrollServiceImpl implements PayrollService {
         .collect(Collectors.toList());
   }
 
-  public Payslip generatePayslipForEmployee(Employee employee, Integer month, Integer year,
+  public PayslipResponseDto generatePayslipForEmployee(Employee employee, Integer month, Integer year,
       Map<String, BigDecimal> deductionRates) {
 
     BigDecimal baseSalary = employee.getEmployment().getBaseSalary();
@@ -90,7 +92,7 @@ public class PayrollServiceImpl implements PayrollService {
 
     // Safety check
     if (totalDeductions.compareTo(grossSalary) > 0) {
-      throw new IllegalStateException("Deductions exceed gross salary for employee " + employee.getCode());
+      throw new BadRequestException("Deductions exceed gross salary for employee " + employee.getCode());
     }
 
     BigDecimal netSalary = grossSalary.subtract(totalDeductions);
@@ -110,7 +112,7 @@ public class PayrollServiceImpl implements PayrollService {
     payslip.setYear(year);
     payslip.setStatus(PayslipStatus.PENDING);
 
-    return payslipRepository.save(payslip);
+    return PayslipMapper.toDto(payslipRepository.save(payslip));
   }
 
   private double getRate(Map<String, BigDecimal> map, String key) {
@@ -131,18 +133,19 @@ public class PayrollServiceImpl implements PayrollService {
         .collect(Collectors.toMap(Deduction::getDeductionName, Deduction::getPercentage));
   }
 
-  public List<Payslip> getPayslipsByMonthAndYear(Integer month, Integer year) {
-    return payslipRepository.findByMonthAndYear(month, year);
+  public List<PayslipResponseDto> getPayslipsByMonthAndYear(Integer month, Integer year) {
+    return payslipRepository.findByMonthAndYear(month, year).stream().map(PayslipMapper::toDto).toList();
   }
 
-  public Payslip getEmployeePayslip(UUID employeeId, Integer month, Integer year) {
-    return payslipRepository.findByEmployeeIdAndMonthAndYear(employeeId, month, year)
+  public PayslipResponseDto getEmployeePayslip(UUID employeeId, Integer month, Integer year) {
+    return PayslipMapper.toDto(payslipRepository.findByEmployeeIdAndMonthAndYear(employeeId, month, year)
         .orElseThrow(() -> new ResourceNotFoundException(
-            "Payslip not found for employee " + employeeId + " for " + month + "/" + year));
+            "Payslip not found for employee " + employeeId + " for " + month + "/" + year)));
   }
 
-  public List<Payslip> getEmployeePayslips(UUID employeeId) {
-    return payslipRepository.findByEmployeeIdOrderByYearDescMonthDesc(employeeId);
+  public List<PayslipResponseDto> getEmployeePayslips(UUID employeeId) {
+    return payslipRepository.findByEmployeeIdOrderByYearDescMonthDesc(employeeId).stream().map(PayslipMapper::toDto)
+        .toList();
   }
 
   public void approvePayroll(PayrollRequestDto request) {

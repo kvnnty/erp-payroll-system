@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.gov.erp.v1.audits.Auditable;
 
 @Entity
 @Table(name = "deductions")
@@ -27,7 +26,7 @@ import rw.gov.erp.v1.audits.Auditable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Deduction extends Auditable {
+public class Deduction {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)

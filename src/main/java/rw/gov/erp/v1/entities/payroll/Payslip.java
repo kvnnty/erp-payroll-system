@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import rw.gov.erp.v1.audits.Auditable;
 import rw.gov.erp.v1.entities.employee.Employee;
 import rw.gov.erp.v1.enums.payslip.PayslipStatus;
 
@@ -30,7 +29,7 @@ import rw.gov.erp.v1.enums.payslip.PayslipStatus;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Payslip extends Auditable {
+public class Payslip {
 
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
